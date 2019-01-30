@@ -5,24 +5,24 @@ import java.util.Set;
 
 public class User {
 
-    private Long id;
+    private String email;
     private String username;
     private String passwordHash;
     private String fullName;
     private Set<Post> posts = new HashSet<>();
 
-    public User(long id, String username, String fullName){
-        this.id = id;
+    public User(String email,  String username, String fullName){
+        this.email = email;
         this.username = username;
         this.fullName = fullName;
     }
 
-    public Long getId() {
-        return id;
+    public String getEmail() {
+        return email;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getUsername() {
@@ -60,7 +60,7 @@ public class User {
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                ", email='" + email + '\'' +
                 ", username='" + username + '\'' +
                 ", passwordHash='" + passwordHash + '\'' +
                 ", fullName='" + fullName + '\'' +
