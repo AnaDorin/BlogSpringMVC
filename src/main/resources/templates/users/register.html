@@ -1,36 +1,44 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" ><head th:fragment="site-head">
-    <meta th:include="this :: head" th:remove="tag"/>
-</head><body>
-<head th:replace="layout :: site-head">
-    <title>Register</title>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="layout::site-head">
+    <title>Login</title>
 </head>
 
 <body>
+<header th:replace="layout::site-header"></header>
 
-<header th:replace="layout :: site-header" />
+<h2>User's Registration</h2>
 
-<h1>Register in the Blog</h1>
+<div class="container row">
+    <form action="#" th:action="@{/users/register}" th:object="${user}" method="post"
+          class="form col-md-5 col-md-offset-7">
+        <div class="form-group">
+            <input type="text" th:field="*{userName}" placeholder="User Name"
+                   th:class="${#fields.hasErrors('userName') ? 'form-control is-invalid' : 'form-control'}"/>
+            <div th:if="${#fields.hasErrors('userName')}" th:errors="*{userName}" class="invalid-feedback"></div>
+        </div><!-- User Name -->
+        <div class="form-group">
+            <input type="password" th:field="*{passwordHash}" placeholder="Password"
+                   th:class="${#fields.hasErrors('passwordHash') ? 'form-control is-invalid' : 'form-control'}"/>
+            <div th:if="${#fields.hasErrors('passwordHash')}" th:errors="*{passwordHash}"
+                 class="invalid-feedback"></div>
+        </div><!-- Password -->
+        <div class="form-group">
+            <input type="text" th:field="*{fullName}" placeholder="Full Name"
+                   th:class="${#fields.hasErrors('fullName') ? 'form-control is-invalid' : 'form-control'}"/>
+            <label th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}" class="invalid-feedback"></label>
+        </div><!-- Full Name -->
+        <div class="form-group clearfix">
+            <button type="submit" class="btn btn-primary float-right">Register User</button>
+        </div><!-- Submit Button -->
+        <div class="form-group">
+            <div th:class="${successMessage} ? 'alert alert-success' : ''" th:text="${successMessage}"></div>
+        </div><!-- Success message -->
+    </form>
+</div>
 
-<form method="post" th:object="${registrationForm}">
-    <div><label for="email">Email:</label></div>
-    <input id="email" type="text" name="email" th:value="*{email}" />
-
-    <div><label for="username" th:value="*{username}">Username:</label></div>
-    <input id="username" type="text" name="username" th:value="*{username}" />
-    <span class="formError" th:if="${#fields.hasErrors('username')}"
-          th:errors="*{username}">Invalid username</span>
-
-    <div><label for="password" th:value="*{username}">Password:</label></div>
-    <input id="password" type="password" name="password" th:value="*{password}" />
-
-    <div><input type="submit" value="Register"/>
-        <a href="register.html" th:href="@{/users/register}">Register</a></div>
-</form>
-
-<footer th:replace="layout :: site-footer" />
-
+<footer th:replace="layout::site-footer"></footer>
 </body>
 
-</body>
 </html>
