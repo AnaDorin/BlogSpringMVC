@@ -1,73 +1,36 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" ><head th:fragment="site-head">
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="../../public/css/styles.css" th:href="@{/css/styles.css}" />
-    <script src="../../public/js/jquery-3.1.0.min.js" th:src="@{/js/jquery-3.1.0.min.js}"></script>
-    <script src="../../public/js/blog-scripts.js" th:src="@{/js/blog-scripts.js}"></script>
     <meta th:include="this :: head" th:remove="tag"/>
 </head><body>
-<header th:fragment="site-header" th:remove="tag">
-    <header>
-        <a href="../index.html" th:href="@{/}"><img src="../../public/img/site-logo.png" th:width="50" th:height="50" th:src="@{/img/site-logo.png}" /></a>
-        <a href="../index.html" th:href="@{/}">Home</a>
-        <a href="login.html" th:href="@{/users/login}">Login</a>
-        <a href="register.html" th:href="@{/users/register}">Register</a>
-        <a href="posts/index.html" th:href="@{/posts}">Posts</a>
-        <a href="posts/create.html" th:href="@{/posts/create}">Create Post</a>
-        <a href="users/index.html" th:href="@{/users}">Users</a>
-        <div id="logged-in-info">
-            <span>Hello, <b>(user)</b></span>
-            <form method="post" th:action="@{/users/logout}">
-                <input type="submit" value="Logout"/>
-            </form>
-        </div>
-    </header>
+<head th:replace="layout :: site-head">
+    <title>Register</title>
+</head>
 
-    <ul id="messages" th:with="notifyMessages=${session[T(blog.services
-          .NotificationServiceImpl).NOTIFY_MSG_SESSION_KEY]}">
-        <li th:each="msg : ${notifyMessages}" th:text="${msg.text}"
-            th:class="${#strings.toLowerCase(msg.type)}">
-        </li>
-        <span th:if="${notifyMessages}" th:remove="all" th:text="${session.remove(
-          T(blog.services.NotificationServiceImpl).NOTIFY_MSG_SESSION_KEY)}"></span>
-    </ul>
-</header>
-<div class="container">
-    <form class="form-narrow form-horizontal" method="post" th:action="@{/register}" th:object="${registrationForm}" th:fragment="signupForm">
-        <!--/* Show general error message when form contains errors */-->
-        <th:block th:if="${#fields.hasErrors('${registrationForm.*}')}">
-            <div th:replace="fragments/alert :: alert (type='danger', message='Form contains errors. Please try again.')">Alert</div>
-        </th:block>
-        <fieldset>
-            <legend>Please Sign Up</legend>
-            <div class="form-group" th:classappend="${#fields.hasErrors('email')}? 'has-error'">
-                <label for="email" class="col-lg-2 control-label">Email</label>
-                <div class="col-lg-10">
-                    <input type="text" class="form-control" id="email" placeholder="Email address" th:field="*{email}" />
-                    <span class="help-block" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Incorrect email</span>
-                </div>
-            </div>
-            <div class="form-group" th:classappend="${#fields.hasErrors('username')}? 'has-error'">
-                <label for="email" class="col-lg-2 control-label">Username</label>
-                <div class="col-lg-10">
-                    <input type="text" class="form-control" id="username" placeholder="Username" th:field="*{username}" />
-                    <span class="help-block" th:if="${#fields.hasErrors('email')}" th:errors="*{username}">Incorrect email</span>
-                </div>
-            </div>
-            <div class="form-group" th:classappend="${#fields.hasErrors('password')}? 'has-error'">
-                <label for="password" class="col-lg-2 control-label">Password</label>
-                <div class="col-lg-10">
-                    <input type="password" class="form-control" id="password" placeholder="Password" th:field="*{password}"/>
-                    <span class="help-block" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Incorrect password</span>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-lg-offset-2 col-lg-10">
-                    <button type="submit" class="btn btn-default">Sign up</button>
-                </div>
-            </div>
-        </fieldset>
-    </form>
-</div>
+<body>
+
+<header th:replace="layout :: site-header" />
+
+<h1>Register in the Blog</h1>
+
+<form method="post" th:object="${registrationForm}">
+    <div><label for="email">Email:</label></div>
+    <input id="email" type="text" name="email" th:value="*{email}" />
+
+    <div><label for="username" th:value="*{username}">Username:</label></div>
+    <input id="username" type="text" name="username" th:value="*{username}" />
+    <span class="formError" th:if="${#fields.hasErrors('username')}"
+          th:errors="*{username}">Invalid username</span>
+
+    <div><label for="password" th:value="*{username}">Password:</label></div>
+    <input id="password" type="password" name="password" th:value="*{password}" />
+
+    <div><input type="submit" value="Register"/>
+        <a href="register.html" th:href="@{/users/register}">Register</a></div>
+</form>
+
+<footer th:replace="layout :: site-footer" />
+
+</body>
+
 </body>
 </html>
