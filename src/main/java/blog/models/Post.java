@@ -1,111 +1,79 @@
 package blog.models;
 
-import javax.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
 import java.util.Date;
 
-@Entity
-@Table(name = "posts")
+@Document(collection = "Post")
 public class Post {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(nullable = false, length = 300)
     private String title;
 
-    @Lob
-    @Column(nullable = false)
     private String body;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Date date = new Date();
+
+    @Indexed(direction = IndexDirection.DESCENDING, dropDups = true)
+
+    @DBRef
     private User author;
 
-    @Column(nullable = false)
-    private Date date = new Date();
-    /**
-     * @return the id
-     */
-    public Long getId() {
+
+    public String getId() {
         return id;
     }
-    /**
-     * @param id the id to set
-     */
-    public void setId(Long id) {
+
+
+    public void setId(String id) {
         this.id = id;
     }
-    /**
-     * @return the title
-     */
+
     public String getTitle() {
         return title;
     }
-    /**
-     * @param title the title to set
-     */
+
     public void setTitle(String title) {
         this.title = title;
     }
-    /**
-     * @return the body
-     */
+
     public String getBody() {
         return body;
     }
-    /**
-     * @param body the body to set
-     */
+
     public void setBody(String body) {
         this.body = body;
     }
-    /**
-     * @return the author
-     */
+
     public User getAuthor() {
         return author;
     }
-    /**
-     * @param author the author to set
-     */
+
     public void setAuthor(User author) {
         this.author = author;
     }
-    /**
-     * @return the date
-     */
+
     public Date getDate() {
         return date;
     }
-    /**
-     * @param date the date to set
-     */
+
     public void setDate(Date date) {
         this.date = date;
     }
-    /**
-     *
-     */
+
     public Post() {
     }
-    /**
-     * @param id
-     * @param title
-     * @param body
-     * @param author
-     */
-    public Post(Long id, String title, String body, User author) {
+
+    public Post(String id, String title, String body, User author) {
         this.id = id;
         this.title = title;
         this.body = body;
         this.author = author;
     }
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "Post []";
-    }
-
 }

@@ -1,122 +1,88 @@
 package blog.models;
 
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.IndexDirection;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Column;
-// Needed for JPA (Java Persistence API)
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-
+@Document(collection = "user")
 public class User {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
+    @Indexed(unique = true, direction = IndexDirection.DESCENDING, dropDups = true)
+    private String email;
+    private String password;
+    private String fullname;
+    private boolean enabled;
 
-    @Column(nullable = false, length = 30, unique = true)
-    @NotEmpty(message = "Please provide your User Name")
-    private String userName;
-
-    @Column(length = 60)
-    @Length(min = 5, message = "Your password must have at least 5 characters")
-    @NotEmpty(message = "Please provide your password")
-    private String passwordHash;
-
-    @Column(length = 100)
-    @NotEmpty(message = "Please provide your full name")
-    private String fullName;
-
-    @OneToMany(mappedBy = "author")
+    @DBRef
     private Set<Post> posts = new HashSet<>();
-    /**
-     * @return the id
-     */
-    public Long getId() {
+    @DBRef
+    private Set<Role> roles;
+
+    public String getId() {
         return id;
     }
-    /**
-     * @param id the id to set
-     */
-    public void setId(Long id) {
+
+    public void setId(String id) {
         this.id = id;
     }
-    /**
-     * @return the userName
-     */
-    public String getUserName() {
-        return userName;
+
+    public String getEmail() {
+        return email;
     }
-    /**
-     * @param userName the userName to set
-     */
-    public void setUserName(String userName) {
-        this.userName = userName;
+
+    public void setEmail(String email) {
+        this.email = email;
     }
-    /**
-     * @return the passwordHash
-     */
-    public String getPasswordHash() {
-        return passwordHash;
+
+    public String getPassword() {
+        return password;
     }
-    /**
-     * @param passwordHash the passwordHash to set
-     */
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+
+    public void setPassword(String password) {
+        this.password = password;
     }
-    /**
-     * @return the fullName
-     */
-    public String getFullName() {
-        return fullName;
+
+    public String getFullname() {
+        return fullname;
     }
-    /**
-     * @param fullName the fullName to set
-     */
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
-    /**
-     * @return the posts
-     */
-    public Set<Post> getPosts() {
-        return posts;
+
+    public boolean isEnabled() {
+        return enabled;
     }
-    /**
-     * @param posts the posts to set
-     */
-    public void setPosts(Set<Post> posts) {
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public void setPosts(Set<Post> posts){
         this.posts = posts;
     }
-    /**
-     * @param id
-     * @param userName
-     * @param fullName
-     */
-    public User(Long id, String userName, String fullName) {
-        this.id = id;
-        this.userName = userName;
-        this.fullName = fullName;
-    }
-    /**
-     *
-     */
-    public User() {
-    }
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return "User [id=" + id + ", userName=" + userName + ", passwordHash=" + passwordHash + ", fullName=" + fullName + "]";
+
+    public Set<Post> getPosts(){
+        return posts;
     }
 
-
+    public void addPost(Post post){
+        posts.add(post);
+    }
 }
-

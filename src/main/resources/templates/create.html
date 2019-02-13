@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{default}">
+<head>
+    <title>Write a new post</title>
+</head>
+<body class="text-center">
+<div layout:fragment="content">
+    <form th:action="@{/create}" method="post">
+        <button class="btn btn-lg btn-primary btn-block" type="submit" id="submitButton" th:value="Save"></button>
+        <label for="title" class="form-control">Title</label>
+        <input type="text" id="title" name="title"/>
+        <label for="body" class="form-control">Body</label>
+        <input type="text" id="body" name="body"/>
+
+        <!--<label for="inputUsername" class="sr-only">Username</label>-->
+        <!--<input type="text" name="username" id="inputUsername" class="form-control" placeholder="Username" required="" />-->
+    </form>
+</div>
+</body>
+</html>

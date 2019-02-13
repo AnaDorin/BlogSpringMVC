@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="~{default}">
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
+    <!--<h1 th:inline="text" th:text="${#httpServletRequest.getRemoteUser()}"> </h1>-->
+    <h2>This is your Admin Dashboard</h2>
+    <h3>Your posts all in one place:</h3>
+    <div class="container">
+        <form class="form-posts" th:action="@{/dashboard}" method="post">
+        <tr th:if="${posts.empty}">
+            <td colspan="2"> No Posts Available </td>
+        </tr>
+        <tr th:each="post: ${posts}">
+            <td><span th:text="${post.title}"> Title </span></td>
+            <td><span th:text="${post.body}"> Author </span></td>
+        </tr>
+        </form>
+    </div>
+        <div class="button">
+        <form class="form-login" th:action="@{/create}" method="get">
+            <button class="btn btn btn-primary btn-block" type="Submit">Create a Post</button>
+        </form>
+        </div>
+</div>
+</body>
+</html>

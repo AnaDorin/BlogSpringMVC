@@ -1,15 +1,15 @@
 package blog.configuration;
 
-import javax.sql.DataSource;
-
+import blog.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -18,62 +18,60 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    /**
-     * Needed to read credentials parse password
-     * TODO https://medium.com/@gustavo.ponce.ch/spring-boot-spring-mvc-spring-security-mysql-a5d8545d837d
-     */
     @Autowired
-    private DataSource dataSource;
+    CustomizeAuthenticationSuccessHandler customizeAuthenticationSuccessHandler;
+
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    /**
-     * Read query statement from application.properties file
-     */
-    @Value("${spring.queries.users-query}")
-    private String usersQuery;
 
-    @Value("${spring.queries.roles-query}")
-    private String rolesQuery;
+    @Bean
+    public UserDetailsService mongoUserDetails() {
+        return new CustomUserDetailsService();
+    }
 
-    /**
-     * Perform a query against the database with user name and password fields
-     */
     @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception{
-        auth.jdbcAuthentication()
-                .usersByUsernameQuery(usersQuery)
-                .authoritiesByUsernameQuery(rolesQuery)
-                .dataSource(dataSource)
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        UserDetailsService userDetailsService = mongoUserDetails();
+        auth
+                .userDetailsService(userDetailsService)
                 .passwordEncoder(bCryptPasswordEncoder);
-    }
-    /**
-     * Configure HTTP permissions
-     */
-    @Override
-    protected void configure(HttpSecurity http) throws Exception{
 
-        http.authorizeRequests()
-                .antMatchers("/", "/home", "/error/**", "/posts", "/posts/view/**", "/users/logout", "/users/register", "/users/login").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin()
-                .loginPage("/users/login").failureUrl("/users/login?error=true").defaultSuccessUrl("/")
-                .usernameParameter("userName").passwordParameter("passwordHash")
-                .and()
-                .logout()
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .logoutRequestMatcher(new AntPathRequestMatcher("/users/logout"))
-                .logoutSuccessUrl("/").and().exceptionHandling()
-                .accessDeniedPage("/error/403");
     }
+//
+//    @Override
+//    protected void configure(final AuthenticationManagerBuilder auth) throws Exception {
+//        auth.inMemoryAuthentication()
+//                .withUser("user1").password(bCryptPasswordEncoder.encode("user1Pass")).roles("USER")
+//                .and()
+//                .withUser("user2").password(bCryptPasswordEncoder.encode("user2Pass")).roles("USER")
+//                .and()
+//                .withUser("admin").password(bCryptPasswordEncoder.encode("adminPass")).roles("USER");
+//    }
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                .antMatchers("/").permitAll()
+                .antMatchers("/login").permitAll()
+                .antMatchers("/register").permitAll()
+                .antMatchers("/dashboard/**").hasAuthority("ADMIN").anyRequest()
+                .authenticated().and().csrf().disable().formLogin().successHandler(customizeAuthenticationSuccessHandler)
+                .loginPage("/login").failureUrl("/login?error=true")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .and().logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                .logoutSuccessUrl("/").and().exceptionHandling();
+    }
+
     /**
-     * Configure Web permissions (images, css, js, etc.)
+     * Configure Web permissions (images, static, js, etc.)
      */
     @Override
-    public void configure(WebSecurity web) throws Exception{
+    public void configure(WebSecurity web) throws Exception {
         web.ignoring()
-                .antMatchers("/resources/**", "/static/**", "/css/**", "/img/**", "/js/**");
+                .antMatchers("/resources/**", "/static/**", "/static/**", "/img/**", "/js/**");
 
     }
 

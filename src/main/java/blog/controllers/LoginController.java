@@ -1,63 +1,75 @@
 package blog.controllers;
 
-import blog.forms.LoginForm;
 import blog.models.User;
-import blog.services.UserService;
+
 import javax.validation.Valid;
 
+import blog.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-
-import javax.validation.Valid;
 
 @Controller
 public class LoginController {
 
     @Autowired
-    private UserService userService;
+    CustomUserDetailsService customUserDetailsService;
 
-    @RequestMapping("/users/login")
-    public String login(LoginForm loginForm){
-        // User doesn't need to re-enter credentials
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if ( (auth instanceof AnonymousAuthenticationToken) ) {
-            return "users/login";
-        } else {
-            return "redirect:/";
-        }
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    public ModelAndView login() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("login");
+        return modelAndView;
     }
 
-    @RequestMapping("/users/register")
-    public ModelAndView registration(){
+    @RequestMapping("/logout")
+    public String logout(User user) {
+        return "logout";
+    }
+
+    @RequestMapping("/register")
+    public ModelAndView registration() {
         ModelAndView modelAndView = new ModelAndView();
         User user = new User();
         modelAndView.addObject(user);
-        modelAndView.setViewName("users/register");
+        modelAndView.setViewName("register");
         return modelAndView;
     }
-    @RequestMapping(value = "users/register", method = RequestMethod.POST)
-    public ModelAndView registration(@Valid User user, BindingResult bindingResult){
+
+    @RequestMapping(value = "/register", method = RequestMethod.POST)
+    public ModelAndView createNewUser(@Valid User user, BindingResult bindingResult) {
         ModelAndView modelAndView = new ModelAndView();
-        User userExists = this.userService.findByUserName(user.getUserName());
-        modelAndView.setViewName("users/register");
-        if( userExists != null ){
-            bindingResult.rejectValue("userName", "error.user", "User exists");
+        User userExists = customUserDetailsService.findUserByEmail(user.getEmail());
+        if (userExists != null) {
+            bindingResult
+                    .rejectValue("email", "error.user",
+                            "There is already a user registered with the username provided");
         }
-        if( !bindingResult.hasErrors() ){
-            this.userService.create(user);
-            modelAndView.addObject("successMessage", "User has been created");
+        if (bindingResult.hasErrors()) {
+            modelAndView.setViewName("register");
+        } else {
+            customUserDetailsService.saveUser(user);
+            modelAndView.addObject("successMessage", "User has been registered successfully");
             modelAndView.addObject("user", new User());
+            modelAndView.setViewName("login");
+
         }
         return modelAndView;
-
     }
 
+    @RequestMapping(value = {"/","/home"}, method = RequestMethod.GET)
+    public ModelAndView home() {
+        ModelAndView modelAndView = new ModelAndView();
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = customUserDetailsService.findUserByEmail(auth.getName());
+        modelAndView.addObject("currentUser", user);
+        modelAndView.addObject("fullName", "Welcome " + user.getFullname());
+        modelAndView.setViewName("home");
+        return modelAndView;
+    }
 }
