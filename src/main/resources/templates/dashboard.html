@@ -7,26 +7,47 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <h1 th:inline="text">Hello [[${#httpServletRequest.remoteUser}]]!</h1>
-    <!--<h1 th:inline="text" th:text="${#httpServletRequest.getRemoteUser()}"> </h1>-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <h1 th:inline="text">Hello, [[${#httpServletRequest.remoteUser}]]!</h1>
     <h2>This is your Admin Dashboard</h2>
     <h3>Your posts all in one place:</h3>
-    <div class="container">
+    <div class="container-dashboard">
         <form class="form-posts" th:action="@{/dashboard}" method="post">
-        <tr th:if="${posts.empty}">
-            <td colspan="2"> No Posts Available </td>
-        </tr>
-        <tr th:each="post: ${posts}">
-            <td><span th:text="${post.title}"> Title </span></td>
-            <td><span th:text="${post.body}"> Author </span></td>
-        </tr>
+            <tr th:if="${posts.empty}">
+                <td colspan="2"> No Posts Available</td>
+            </tr>
+            <h4>
+                <small>RECENT POSTS</small>
+            </h4>
+
+            <form role="form">
+
+                <tr th:each="post: ${posts}">
+                    <td><span><h2 th:text="${post.title}"> Title </h2></span></td>
+                    <h5><span th:text="${post.date}"></span></h5>
+                    <p><span th:text="${post.body}"> Author </span></p>
+
+                    <h4>Leave a Comment:</h4>
+
+                    <div class="form-group1">
+                        <textarea class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success">Submit</button>
+
+                    <br><br>
+                </tr>
+
+            </form>
+
         </form>
     </div>
-        <div class="button">
+
+    <div class="button">
         <form class="form-login" th:action="@{/create}" method="get">
             <button class="btn btn btn-primary btn-block" type="Submit">Create a Post</button>
         </form>
-        </div>
+    </div>
+
 </div>
 </body>
 </html>

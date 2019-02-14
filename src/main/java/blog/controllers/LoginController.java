@@ -20,6 +20,13 @@ public class LoginController {
     @Autowired
     CustomUserDetailsService customUserDetailsService;
 
+    @RequestMapping(value = "/test", method = RequestMethod.GET)
+    public ModelAndView test() {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("test");
+        return modelAndView;
+    }
+
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView login() {
         ModelAndView modelAndView = new ModelAndView();
