@@ -5,6 +5,7 @@ import blog.models.User;
 import javax.validation.Valid;
 
 import blog.services.CustomUserDetailsService;
+import blog.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class LoginController {
+
+    @Autowired
+    PostService postService;
 
     @Autowired
     CustomUserDetailsService customUserDetailsService;
@@ -69,10 +73,28 @@ public class LoginController {
         return modelAndView;
     }
 
+    @RequestMapping(value = "/dashboard", method = RequestMethod.GET)
+    public ModelAndView dashboard() {
+        ModelAndView modelAndView = new ModelAndView("dashboard");
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = customUserDetailsService.findUserByEmail(auth.getName());
+        modelAndView.addObject("currentUser", user);
+        modelAndView.addObject("fullName", "Welcome " + user.getFullname());
+        modelAndView.addObject("adminMessage", "Content Available Only for Users with Admin Role");
+        modelAndView.addObject("posts", postService.findByAuthor(user));
+        return modelAndView;
+    }
+
     @RequestMapping(value = {"/","/home"}, method = RequestMethod.GET)
     public ModelAndView home() {
         ModelAndView modelAndView = new ModelAndView();
+        // brandon add
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = customUserDetailsService.findUserByEmail(auth.getName());
+        modelAndView.addObject("currentUser", user);
+        //brandon end
         modelAndView.setViewName("home");
         return modelAndView;
     }
+
 }
